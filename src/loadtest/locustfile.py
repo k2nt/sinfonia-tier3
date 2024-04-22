@@ -4,6 +4,10 @@ import time
 import toml
 import gevent
 import logging
+import numpy as np
+import csv
+import threading
+from pathlib import Path
 
 import locust.stats
 from locust import FastHttpUser, events, task, constant_throughput
@@ -123,11 +127,55 @@ def on_startup(environment, **kw):
 #   "user_count": 1
 # }
         
-# @events.worker_report.add_listener
-# def on_worker_report(client_id, data):
-#     import pprint
-#     pprint.pprint(data)
+latency_buffer = []
+latency_buffer_lock = threading.Lock()
+
+@events.worker_report.add_listener
+def on_worker_report(client_id, data):
+    
+    stats_total = data['stats_total']
+    response_times = stats_total['response_times']
+    
+    if not response_times:
+        return
+    
+    response_times_list = []
+    for time, count in response_times.items():
+        response_times_list.extend([time] * count)
+
+    p50 = np.percentile(response_times_list, 50)
+    p95 = np.percentile(response_times_list, 95)
+    
+    # num_rps = stats_total['num_reqs_per_sec']s
+    start_ts = stats_total['start_time']
+    last_request_ts = stats_total['last_request_timestamp']
+    
+    with latency_buffer_lock:
+        latency_buffer.append([
+            start_ts,
+            last_request_ts,
+            p50,
+            p95
+        ])
+    
+def write_latency_data(latency_csv_file):
+    with latency_buffer_lock:
+        if not latency_buffer:
+            return
+        with open(latency_csv_file, 'a') as latency_csv_fp:
+            latency_csv_writer = csv.writer(latency_csv_fp)
+            for worker_data in latency_buffer:
+                latency_csv_writer.writerow(worker_data)
         
+        latency_buffer.clear()
+
+def latency_report_job(c: daemon.carbon_report.CarbonReportConfig):
+    fn = f"latency-report-{c.rps}rps-{c.matrix_size}msz.csv"
+    fp = Path(c.report_root_path) / fn
+    while True:
+        write_latency_data(fp)
+        time.sleep(c.report_per_second)
+    
         
 def init_resources():
     global _CONFIG
@@ -180,4 +228,6 @@ def start_daemons():
         )
     
     daemon.start(j, c)
-        
+    
+    t = threading.Thread(target=latency_report_job, args=[c], daemon=True)
+    t.start()
