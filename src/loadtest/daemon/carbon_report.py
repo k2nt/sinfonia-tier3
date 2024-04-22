@@ -20,7 +20,7 @@ def job(c: CarbonReportConfig):
     class _CsvFmt:
         timestamp: int
         carbon_intensity_gco2_kwh: float
-        energy_use_watts: float
+        energy_use_joules: float
         carbon_emission_gco2: float
         cpu_ratio_pct: float
         mem_ratio_pct: float
@@ -48,7 +48,7 @@ def job(c: CarbonReportConfig):
         
         data = req_carbon.json()
         ci = data.get('carbon_intensity_gco2_kwh', '')
-        eu = data.get('energy_use_watts', '')
+        eu = data.get('energy_use_joules', '')
         ce = data.get('carbon_emission_gco2', '')
         
         req_resu = requests.get(
@@ -67,7 +67,7 @@ def job(c: CarbonReportConfig):
                 _CsvFmt(
                     timestamp=int(time.time()),
                     carbon_intensity_gco2_kwh=ci,
-                    energy_use_watts=eu,
+                    energy_use_joules=eu,
                     carbon_emission_gco2=ce,
                     cpu_ratio_pct=cpu_ratio * 100,
                     mem_ratio_pct=mem_ratio * 100
