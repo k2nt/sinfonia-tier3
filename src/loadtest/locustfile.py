@@ -143,7 +143,7 @@ def on_worker_report(client_id, data):
     for time, count in response_times.items():
         response_times_list.extend([time] * count)
 
-    p50 = np.percentile(response_times_list, 50)
+    avg_latency = np.mean(response_times_list)
     p95 = np.percentile(response_times_list, 95)
     
     # num_rps = stats_total['num_reqs_per_sec']s
@@ -154,7 +154,7 @@ def on_worker_report(client_id, data):
         latency_buffer.append([
             start_ts,
             last_request_ts,
-            p50,
+            avg_latency,
             p95
         ])
     
