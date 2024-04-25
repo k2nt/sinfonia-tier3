@@ -145,7 +145,7 @@ def sinfonia_tier3_loadtest(
             error_log = f'failed to deploy backend: "{e.response.text}"'
         except Exception as e:
             deployment_status = DeploymentStatus.FAILED
-            error_log = f'failed with message: {str(e)}'
+            error_log = f'failed with message: {e}'
 
         # Pick the best deployment (first returned for now...)
         if error_log is None:
@@ -159,19 +159,20 @@ def sinfonia_tier3_loadtest(
             deployment_status=deployment_status,
             error_log=error_log,
             connected_deployment=deployment_data,
-        )
+            )
         
         if error_log:
-            continue
+            break
         
         # This is to wait for loadtest app to completely terminate
         # Not ideal (and can bug), but this seems to work for now
-        print()
-        print("10-second countdown before next test")
-        for i in range(10, 0, -1):
-            print(f"{i} ... ", end='', flush=True)
-            time.sleep(1)
-        print("Done!")
+        if t > 0:
+            print()
+            print("10-second countdown before next test")
+            for i in range(10, 0, -1):
+                print(f"{i} ... ", end='', flush=True)
+                time.sleep(1)
+            print("Done!")
             
         if dry_run:
             continue
@@ -192,7 +193,7 @@ def sinfonia_tier3_loadtest(
     
     print()    
     print()
-    print("TEST RECAP")
+    print("TEST RECAP (NOT IMPLEMENTED)")
     print_separator()
     print()
 

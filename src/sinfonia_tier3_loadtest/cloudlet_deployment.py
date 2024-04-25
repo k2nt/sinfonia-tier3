@@ -100,7 +100,7 @@ def sinfonia_deploy(
         application_uuid: UUID,
         debug: bool = False, 
 ) -> list[CloudletDeployment]:
-    """Request a backend (re)deployment from the orchestrator"""
+    """Request a backend (re)deployment from the orchestrator"""    
     deploy_base = tier1_url
 
     deployment_keys = KeyCacheEntry.load(application_uuid)

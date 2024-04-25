@@ -17,7 +17,7 @@ app = typer.Typer()
 def loadtest(
         config_path: str = typer.Option('src/loadtest/.cli.toml'),
         headless: bool = typer.Option(False),
-        tier2_url: str = typer.Option("")
+        tier2_url: str = typer.Option(""),
 ):    
     config = Config(config_path)
     if tier2_url:
@@ -49,7 +49,7 @@ def loadtest(
             print()
         
         num_users = config.c['load']['users']
-        print(f'Running loadtest @ {rps_per_user * num_users * 50} req/sec ...', flush=True)
+        print(f'Running loadtest @ {rps_per_user * num_users * 10} req/sec ...', flush=True)
         
         # Export locust config to file
         config.export_cli_to_toml(str(Path(config_path).parent / ".locust.autogen.toml"), rps_per_user)

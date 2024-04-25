@@ -147,15 +147,15 @@ def on_worker_report(client_id, data):
     p95 = np.percentile(response_times_list, 95)
     
     # num_rps = stats_total['num_reqs_per_sec']s
-    start_ts = stats_total['start_time']
+    # start_ts = stats_total['start_time']
     last_request_ts = stats_total['last_request_timestamp']
     
     with latency_buffer_lock:
         latency_buffer.append([
-            start_ts,
-            last_request_ts,
-            avg_latency,
-            p95
+            # round(start_ts),
+            round(last_request_ts),
+            round(avg_latency),
+            round(p95)
         ])
     
 def write_latency_data(latency_csv_file):
