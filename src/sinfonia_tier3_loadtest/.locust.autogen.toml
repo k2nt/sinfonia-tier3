@@ -3,22 +3,23 @@
 [report]
 is_report_locust_stats = false
 report_per_second = 15
-report_root_path = "src/sinfonia_tier3_loadtest/report/1714167420"
+report_root_path = "src/sinfonia_tier3_loadtest/report/1714241902"
 
 [network]
-app_root_url = "http://192.168.245.32:30080/api/v1"
-tier2_root_url = "http://192.168.245.32:30051/api/v1"
+app_root_url = "http://192.168.245.31:30080/api/v1"
+tier2_root_url = "http://192.168.245.31:30051/api/v1"
 
 [load]
+simulated_latency_ms = 50
 num_concurrent_clients = 1
-matrix_size = 50
+matrix_size = 100
 is_generate_matrix = false
-rps_per_users = [ 1.0, 5.0, 10.0, 15.0, 20.0, 50.0,]
+rps_per_users = [ 10,]
 run_time = "3m"
-users = 1
-processes = 1
+users = 5
+processes = 5
 spawn_rate = 2
-rps_per_user = 1.0
+rps_per_user = 10
 
 [metadata]
-bts_unix = 1714167420
+bts_unix = 1714241902

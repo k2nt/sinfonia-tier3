@@ -43,7 +43,7 @@ def job(c: CarbonReportConfig):
 
         req_carbon = requests.get(
             c.carbon_url,
-            params={'tspad': (ct - c.bts_unix) * c.clock_seconds_per_second},
+            params={'tspad': 0},
             )
         
         data = req_carbon.json()
@@ -83,7 +83,6 @@ class CarbonReportConfig(daemon.Config):
     bts_unix: int  # Base timestamp Unix
     matrix_size: int  
     rps: int  # RPS for the current session
-    clock_seconds_per_second: int  # Seconds per seconds
     carbon_url: URL | str  # Carbon data URL
     resu_url: URL | str  # Resource usage URL
     report_per_second: int  # Report interval

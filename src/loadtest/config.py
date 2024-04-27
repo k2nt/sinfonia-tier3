@@ -37,7 +37,7 @@ class Config:
             self, 
             rps_per_user: int = 0, 
             web_port: int = 8089,
-            master_port: int = 5577) -> List[str]:
+            master_port: int = 5557) -> List[str]:
         a = []
         
         a.append('--autostart')

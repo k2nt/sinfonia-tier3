@@ -20,6 +20,7 @@ import src.loadtest.daemon as daemon
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
 
+_SIMULATED_LATENCY_MS = 0
 _NUM_CONCURRENT_REQ = 10
 _RPS_PER_USER: float = 0
 _CONFIG: Dict[str, Any] = dict()
@@ -33,10 +34,13 @@ _MATRIX_SIZE = int = 0
 
 class MatMulUser(FastHttpUser):
     # Number of allowed concurrent requests
-    concurrency = 100
+    # concurrency = 100
 
     @task()
     def matmul(self):
+        # simulate latency
+        time.sleep(_SIMULATED_LATENCY_MS)
+        
         def _matmul():
             self.client.get(
                 _MATMUL_URL,
@@ -46,7 +50,7 @@ class MatMulUser(FastHttpUser):
                     }
                 )
     
-        # Spawn concurrent coroutines        
+        # spawn concurrent coroutines        
         pool = gevent.pool.Pool()
         for _ in range(_NUM_CONCURRENT_REQ):
             pool.spawn(_matmul)
@@ -77,56 +81,7 @@ def on_startup(environment, **kw):
 #     logging.info(f'Reporting to master runner ... {data}')
 #     pass
         
-  
-# LOCUST DATA OBJECT      
-# {
-#   "hello": "world",
-#   "stats": [
-#     {
-#       "name": "http://localhost:8000/matmul",
-#       "method": "GET",
-#       "last_request_timestamp": 1709935345.0991318,
-#       "start_time": 1709935342.9823792,
-#       "num_requests": 3,
-#       "num_none_requests": 0,
-#       "num_failures": 3,
-#       "total_response_time": 4,
-#       "max_response_time": 2,
-#       "min_response_time": 1,
-#       "total_content_length": 0,
-#       "response_times": { "1": 2, "2": 1 },
-#       "num_reqs_per_sec": { 1709935343: 1, 1709935344: 1, 1709935345: 1 },
-#       "num_fail_per_sec": { 1709935343: 1, 1709935344: 1, 1709935345: 1 }
-#     }
-#   ],
-#   "stats_total": {
-#     "name": "Aggregated",
-#     "method": "",
-#     "last_request_timestamp": 1709935345.0991127,
-#     "start_time": 1709935342.9824312,
-#     "num_requests": 3,
-#     "num_none_requests": 0,
-#     "num_failures": 3,
-#     "total_response_time": 4,
-#     "max_response_time": 2,
-#     "min_response_time": 1,
-#     "total_content_length": 0,
-#     "response_times": { "1": 2, "2": 1 },
-#     "num_reqs_per_sec": { 1709935343: 1, 1709935344: 1, 1709935345: 1 },
-#     "num_fail_per_sec": { 1709935343: 1, 1709935344: 1, 1709935345: 1 }
-#   },
-#   "errors": {
-#     "77b14b0cfa3ab825485fcae739d0d8fa6ca6f75205f71c102dce61073af47721": {
-#       "name": "http://localhost:8000/matmul",
-#       "method": "GET",
-#       "error": "ConnectionRefusedError(111, 'Connection refused')",
-#       "occurrences": 3
-#     }
-#   },
-#   "user_classes_count": { "MatMulUser": 1 },
-#   "user_count": 1
-# }
-        
+
 latency_buffer = []
 latency_buffer_lock = threading.Lock()
 
@@ -181,6 +136,9 @@ def init_resources():
     global _CONFIG
     _CONFIG = toml.load('src/sinfonia_tier3_loadtest/.locust.autogen.toml')
     
+    global _SIMULATED_LATENCY_MS
+    _SIMULATED_LATENCY_MS = _CONFIG['load']['simulated_latency_ms']
+    
     global _RPS_PER_USER
     _RPS_PER_USER = _CONFIG['load']['rps_per_user']
     
@@ -221,7 +179,6 @@ def start_daemons():
         bts_unix=_CONFIG['metadata']['bts_unix'],
         matrix_size=_MATRIX_SIZE,
         rps=_RPS_PER_USER * _CONFIG['load']['users'] * _NUM_CONCURRENT_REQ,
-        clock_seconds_per_second=_CONFIG['load']['clock_seconds_per_second'],
         carbon_url=str(URL(_TIER2_ROOT_URL) / 'carbon'),
         resu_url=str(URL(_TIER2_ROOT_URL) / 'resu'),
         report_per_second=_CONFIG['report']['report_per_second'],
