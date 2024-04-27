@@ -17,7 +17,7 @@ from yarl import URL
 import src.loadtest.daemon as daemon
 
 
-locust.stats.CSV_STATS_INTERVAL_SEC = 2
+locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
 
 _NUM_CONCURRENT_REQ = 10
@@ -35,7 +35,7 @@ class MatMulUser(FastHttpUser):
     # Number of allowed concurrent requests
     concurrency = 100
 
-    @task
+    @task()
     def matmul(self):
         def _matmul():
             self.client.get(
@@ -170,7 +170,7 @@ def write_latency_data(latency_csv_file):
         latency_buffer.clear()
 
 def latency_report_job(c: daemon.carbon_report.CarbonReportConfig):
-    fn = f"latency-report-{c.rps}rps-{c.matrix_size}msz.csv"
+    fn = f"latency-report-{c.num_user}-{c.rps}rps-{c.matrix_size}msz.csv"
     fp = Path(c.report_root_path) / fn
     while True:
         write_latency_data(fp)
@@ -215,8 +215,9 @@ def start_daemons():
     if 'report' not in _CONFIG:
         return
     
-    j = daemon.carbon_report.job
+    # j = daemon.carbon_report.job
     c = daemon.carbon_report.CarbonReportConfig(
+        num_user=_CONFIG['load']['users'],
         bts_unix=_CONFIG['metadata']['bts_unix'],
         matrix_size=_MATRIX_SIZE,
         rps=_RPS_PER_USER * _CONFIG['load']['users'] * _NUM_CONCURRENT_REQ,
@@ -227,7 +228,7 @@ def start_daemons():
         report_root_path=_CONFIG['report']['report_root_path'],
         )
     
-    daemon.start(j, c)
+    # daemon.start(j, c)
     
     t = threading.Thread(target=latency_report_job, args=[c], daemon=True)
     t.start()

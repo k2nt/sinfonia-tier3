@@ -18,7 +18,7 @@ tier2_root_url = "http://192.168.245.35:30051/api/v1"
 
 [load]
 # TODO: Need to figure out how to run test on 0rps
-clock_seconds_per_second = 0
+num_concurrent_clients = 3
 matrix_size = 50
 is_generate_matrix = true
 # rps_per_users = [0.5, 2.5, 5.0, 7.5, 10.0, 12.5] # 0.1, 0.5, 2.5, 5.0, 7.5, 10.0,

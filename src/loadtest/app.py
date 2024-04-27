@@ -56,15 +56,30 @@ def loadtest(
         
         locust_command = shutil.which("locust")
         assert locust_command is not None
-        
+
         loadtest_command = [locust_command] + config.to_locust_args(rps_per_user)
-        
+    
         loadtest_proc = subprocess.Popen(
             loadtest_command,
             text=True,
             )
         
         _ = loadtest_proc.wait()
+        
+        # num_concurrent_clients = config.c['load']['num_concurrent_clients']
+        # for i in range(num_concurrent_clients):
+        #     web_port = 8089 + i
+        #     master_port = 5577 + i
+        #     loadtest_command = [locust_command] + config.to_locust_args(rps_per_user, web_port, master_port)
+            
+        #     print(loadtest_command)
+        
+        #     loadtest_proc = subprocess.Popen(
+        #         loadtest_command,
+        #         text=True,
+        #         )
+        
+        #    _ = loadtest_proc.wait()
         
         
 
