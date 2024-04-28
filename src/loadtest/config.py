@@ -8,6 +8,7 @@ from pathlib import Path
 class Config:
     def __init__(
             self, 
+            node_name: str,
             config_path: Path | str, 
     ):
         self.c: Dict[str, Dict] = toml.load(config_path)
@@ -25,19 +26,20 @@ class Config:
             'bts_unix': int(time.time())
             }
         
-        # Append base timestamp to report path
+        # Append base timestamp and node name to report path
         
         if not self.c['cli']['is_report']:
             del self.c['report']
         else:
-            self.c['report']['report_root_path'] = str(Path(self.c['report']['report_root_path']) / str(self.c['metadata']['bts_unix']))
+            self.c['report']['report_root_path'] = str(Path(self.c['report']['report_root_path']) / f"{str(self.c['metadata']['bts_unix'])}-{node_name}")
     
 
     def to_locust_args(
             self, 
             rps_per_user: int = 0, 
-            web_port: int = 8099,
-            master_port: int = 5555) -> List[str]:
+            web_port: int = 8089,
+            master_port: int = 5557
+    ) -> List[str]:
         a = []
         
         a.append('--autostart')

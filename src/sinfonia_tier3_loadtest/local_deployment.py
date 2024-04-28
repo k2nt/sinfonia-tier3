@@ -60,7 +60,7 @@ def sudo_create_wireguard_tunnel(
     )
     
 
-def run_loadtest_proc(deployment_host, loadtest_config_path, latency_ms):
+def run_loadtest_proc(deployment_host, loadtest_config_path, latency_ms, client_zone, web_port):
     poetry_command = which("poetry")
     assert poetry_command is not None
     
@@ -78,6 +78,10 @@ def run_loadtest_proc(deployment_host, loadtest_config_path, latency_ms):
         loadtest_config_path,
         "--latency-ms",
         str(latency_ms),
+        "--node-name",
+        client_zone,
+        "--web-port",
+        str(web_port)
         ]
     
     try:
@@ -94,6 +98,8 @@ def sinfonia_runapp(
     loadtest_config_path: str,
     application: Sequence[str],
     latency_ms: float,
+    client_zone: str,
+    web_port: int,
     config_debug: bool = False,
 ) -> int:
     """Run application in an isolated network namespace with wireguard tunnel"""
@@ -157,7 +163,7 @@ def sinfonia_runapp(
                     netns_proc.kill()
                     
             try:
-                run_loadtest_proc(deployment_host, loadtest_config_path, latency_ms)
+                run_loadtest_proc(deployment_host, loadtest_config_path, latency_ms, client_zone, web_port)
             except Exception as e:
                 raise e
             

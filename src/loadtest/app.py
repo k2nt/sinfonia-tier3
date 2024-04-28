@@ -17,11 +17,13 @@ app = typer.Typer()
 @app.command()
 def loadtest(
         config_path: str = typer.Option('src/loadtest/.cli.toml'),
+        node_name: str = typer.Option(''),
         headless: bool = typer.Option(False),
         tier2_url: str = typer.Option(""),
         latency_ms: float = typer.Option(0),
+        web_port: int = typer.Option(0)
 ):      
-    config = Config(config_path)
+    config = Config(node_name, config_path)
     if tier2_url:
         config.c["network"]["app_root_url"] = str(URL(tier2_url).with_port(30080) / "api" / "v1")
         config.c["network"]["tier2_root_url"] = str(URL(tier2_url).with_port(30051) / "api" / "v1")
@@ -59,7 +61,8 @@ def loadtest(
         locust_command = shutil.which("locust")
         assert locust_command is not None
 
-        loadtest_command = [locust_command] + config.to_locust_args(rps_per_user)
+        if web_port != 0:
+            loadtest_command = [locust_command] + config.to_locust_args(rps_per_user=rps_per_user, web_port=web_port)
     
         # Clean up previous latency
         remove_latency()

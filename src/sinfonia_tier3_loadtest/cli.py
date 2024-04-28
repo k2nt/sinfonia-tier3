@@ -38,6 +38,7 @@ CLIENT_GEOLOCATION = GeoLocation(lat=30.209041, long=-81.592600)
 # Region
 CONFIG_FILE = 'src/sinfonia_tier3_loadtest/FL.json'
 LATENCY_FILE = 'src/sinfonia_tier3_loadtest/FL.csv'
+GEOLOC_FILE = 'src/sinfonia_tier3_loadtest/FL-geoloc.csv'
 # Zone
 CLIENT_ZONE = 'Jacksonville'
 INJECTED_LATENCY = 0
@@ -71,6 +72,14 @@ def get_value(csv_file, row_name, col_name):
             if row['client'] == row_name:
                 return float(row[col_name])
 
+def get_geoloc_value(csv_file, row_name):
+    with open(csv_file, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['client'] == row_name:
+                return float(row['latitude']), float(row['longitude'])
+
+
 def print_deployment_status(
         application_uuid: UUID,
         deployments: list[CloudletDeployment], 
@@ -101,11 +110,15 @@ def print_deployment_status(
         
         if connected_deployment_host in config.keys():
             server_zone = config[connected_deployment_host]
+            global INJECTED_LATENCY
             INJECTED_LATENCY = get_value(LATENCY_FILE, CLIENT_ZONE, server_zone)
-            print("AAAAAA", CLIENT_ZONE, server_zone, INJECTED_LATENCY)
         else:
             print(f'{connected_deployment_host} is not in the config. Pleae check the config file {CONFIG_FILE}!')
     
+    print(f"  * Client geolocation: {CLIENT_GEOLOCATION}")
+    print(f"  * Client zone: {CLIENT_ZONE}")
+    print(f"  * Host zone: {server_zone}")
+    print(f"  * Simulated latency (milliseconds): {INJECTED_LATENCY}")
     print(f"  * Deployed app: {application_uuid} ({uuid_to_app_name(application_uuid)})")
     print(f"  * Deployment size: {len(deployments)}")
     print(f"  * Deployment hosts: {deployment_hosts}")
@@ -129,8 +142,16 @@ def sinfonia_tier3_loadtest(
         T: int = typer.Option(5, help="Number of samples"),
         config_debug: bool = typer.Option(False),
         debug: bool = typer.Option(False),
+        zone: str = typer.Option(""),
+        web_port: int = typer.Option(8089),
 ) -> int:
-    # latency_ms = 0
+    if zone:
+        global CLIENT_ZONE
+        CLIENT_ZONE = zone
+        
+    lat, long = get_geoloc_value(GEOLOC_FILE, CLIENT_ZONE)
+    global CLIENT_GEOLOCATION
+    CLIENT_GEOLOCATION = GeoLocation(lat=lat, long=long)
     
     try:
         application_uuid = UUID(application_uuid)
@@ -215,6 +236,8 @@ def sinfonia_tier3_loadtest(
                     loadtest_config_path,
                     application,
                     INJECTED_LATENCY,
+                    CLIENT_ZONE,
+                    web_port,
                     config_debug,
                     )
         except Exception as e:
