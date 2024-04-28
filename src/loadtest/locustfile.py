@@ -20,8 +20,7 @@ import src.loadtest.daemon as daemon
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
 
-_SIMULATED_LATENCY_MS = 0
-_NUM_CONCURRENT_REQ = 10
+_NUM_CONCURRENT_REQ = 1
 _RPS_PER_USER: float = 0
 _CONFIG: Dict[str, Any] = dict()
 _TIER2_ROOT_URL: str = ""
@@ -37,10 +36,7 @@ class MatMulUser(FastHttpUser):
     # concurrency = 100
 
     @task()
-    def matmul(self):
-        # simulate latency
-        time.sleep(_SIMULATED_LATENCY_MS)
-        
+    def matmul(self):        
         def _matmul():
             self.client.get(
                 _MATMUL_URL,
@@ -135,9 +131,6 @@ def latency_report_job(c: daemon.carbon_report.CarbonReportConfig):
 def init_resources():
     global _CONFIG
     _CONFIG = toml.load('src/sinfonia_tier3_loadtest/.locust.autogen.toml')
-    
-    global _SIMULATED_LATENCY_MS
-    _SIMULATED_LATENCY_MS = _CONFIG['load']['simulated_latency_ms']
     
     global _RPS_PER_USER
     _RPS_PER_USER = _CONFIG['load']['rps_per_user']

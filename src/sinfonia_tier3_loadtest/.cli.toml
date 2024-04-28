@@ -18,15 +18,14 @@ tier2_root_url = "http://192.168.245.32:30051/api/v1"
 
 [load]
 # TODO: Need to figure out how to run test on 0rps
-simulated_latency_ms = 50
 num_concurrent_clients = 1
 matrix_size = 100
 is_generate_matrix = false
 # rps_per_users = [0.1, 0.5, 1.0, 1.5, 2.0]
 # rps_per_users = [1.0, 5.0, 10.0, 15.0, 20.0, 50.0]
 rps_per_users = [10]
-run_time = "3m"
-users = 5
+run_time = "30m"
+users = 10
 processes = 5
 # expect_workers = 10
 spawn_rate = 2

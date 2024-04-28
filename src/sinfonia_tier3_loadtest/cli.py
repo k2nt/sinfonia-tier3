@@ -153,6 +153,8 @@ def sinfonia_tier3_loadtest(
             deployment_peers_data = list(deployment_data.tunnel_config.peers.values())
             deployment_host = str(deployment_peers_data[0].endpoint_host)
         
+        print(deployments[0])
+        
         print_deployment_status(
             application_uuid=application_uuid,
             deployments=deployments,
