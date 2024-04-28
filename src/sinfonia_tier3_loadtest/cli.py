@@ -105,6 +105,8 @@ def sinfonia_tier3_loadtest(
         config_debug: bool = typer.Option(False),
         debug: bool = typer.Option(False),
 ) -> int:
+    latency_ms = 0
+    
     try:
         application_uuid = UUID(application_uuid)
     except Exception:
@@ -187,10 +189,12 @@ def sinfonia_tier3_loadtest(
                     deployment_host,
                     loadtest_config_path,
                     application,
+                    latency_ms,
                     config_debug,
-                )
+                    )
         except Exception as e:
             print(f"exception: {e}")
+            raise e
             break
     
     print()    

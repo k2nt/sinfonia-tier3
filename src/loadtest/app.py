@@ -7,7 +7,8 @@ from pathlib import Path
 import typer
 from yarl import URL
 
-from loadtest.config import Config
+from .config import Config
+from .latency import setup_latency, remove_latency
 
 
 app = typer.Typer()
@@ -18,7 +19,8 @@ def loadtest(
         config_path: str = typer.Option('src/loadtest/.cli.toml'),
         headless: bool = typer.Option(False),
         tier2_url: str = typer.Option(""),
-):    
+        latency_ms: float = typer.Option(0),
+):      
     config = Config(config_path)
     if tier2_url:
         config.c["network"]["app_root_url"] = str(URL(tier2_url).with_port(30080) / "api" / "v1")
@@ -59,12 +61,22 @@ def loadtest(
 
         loadtest_command = [locust_command] + config.to_locust_args(rps_per_user)
     
+        # Clean up previous latency
+        remove_latency()
+    
+        # Start latency simulation
+        # This should be a with ... as block
+        setup_latency(latency_ms)
+    
         loadtest_proc = subprocess.Popen(
             loadtest_command,
             text=True,
             )
         
         _ = loadtest_proc.wait()
+        
+        # Remove latency
+        remove_latency()
         
         # num_concurrent_clients = config.c['load']['num_concurrent_clients']
         # for i in range(num_concurrent_clients):
