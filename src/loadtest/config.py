@@ -36,12 +36,13 @@ class Config:
     def to_locust_args(
             self, 
             rps_per_user: int = 0, 
-            web_port: int = 8089,
-            master_port: int = 5557) -> List[str]:
+            web_port: int = 8099,
+            master_port: int = 5555) -> List[str]:
         a = []
         
         a.append('--autostart')
         a.extend(['--web-port', web_port])
+        a.extend(['--master-bind-port', master_port])
         a.extend(['--master-port', master_port])
         a.extend(['--autoquit', 1])
         a.extend(['--locustfile', self.c['cli']['locustfile']])

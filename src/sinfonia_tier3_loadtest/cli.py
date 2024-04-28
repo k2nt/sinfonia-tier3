@@ -15,6 +15,8 @@ import time
 import argparse
 from uuid import UUID
 from enum import IntEnum
+import json 
+import csv 
 
 import typer
 from requests.exceptions import HTTPError, ConnectionError
@@ -33,6 +35,12 @@ from .app_name import uuid_to_app_name, app_name_to_uuid
 
 # Jacksonville, FL
 CLIENT_GEOLOCATION = GeoLocation(lat=30.209041, long=-81.592600)
+# Region
+CONFIG_FILE = 'src/sinfonia_tier3_loadtest/FL.json'
+LATENCY_FILE = 'src/sinfonia_tier3_loadtest/FL.csv'
+# Zone
+CLIENT_ZONE = 'Jacksonville'
+INJECTED_LATENCY = 0
 
 
 cli = typer.Typer()
@@ -55,6 +63,13 @@ def deployment_status_repr(s: DeploymentStatus):
 def highlight_repr(s: str) -> str:
     return format.str.bold(format.str.magenta(s))
 
+
+def get_value(csv_file, row_name, col_name):
+    with open(csv_file, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['client'] == row_name:
+                return float(row[col_name])
 
 def print_deployment_status(
         application_uuid: UUID,
@@ -81,6 +96,16 @@ def print_deployment_status(
     app_key = connected_deployment.application_key
     deploy_name = connected_deployment.deployment_name
     
+    with open(CONFIG_FILE) as json_file:
+        config = json.load(json_file)
+        
+        if connected_deployment_host in config.keys():
+            server_zone = config[connected_deployment_host]
+            INJECTED_LATENCY = get_value(LATENCY_FILE, CLIENT_ZONE, server_zone)
+            print("AAAAAA", CLIENT_ZONE, server_zone, INJECTED_LATENCY)
+        else:
+            print(f'{connected_deployment_host} is not in the config. Pleae check the config file {CONFIG_FILE}!')
+    
     print(f"  * Deployed app: {application_uuid} ({uuid_to_app_name(application_uuid)})")
     print(f"  * Deployment size: {len(deployments)}")
     print(f"  * Deployment hosts: {deployment_hosts}")
@@ -105,7 +130,7 @@ def sinfonia_tier3_loadtest(
         config_debug: bool = typer.Option(False),
         debug: bool = typer.Option(False),
 ) -> int:
-    latency_ms = 0
+    # latency_ms = 0
     
     try:
         application_uuid = UUID(application_uuid)
@@ -155,7 +180,7 @@ def sinfonia_tier3_loadtest(
             deployment_peers_data = list(deployment_data.tunnel_config.peers.values())
             deployment_host = str(deployment_peers_data[0].endpoint_host)
         
-        print(deployments[0])
+        # print(deployments[0])
         
         print_deployment_status(
             application_uuid=application_uuid,
@@ -189,7 +214,7 @@ def sinfonia_tier3_loadtest(
                     deployment_host,
                     loadtest_config_path,
                     application,
-                    latency_ms,
+                    INJECTED_LATENCY,
                     config_debug,
                     )
         except Exception as e:
