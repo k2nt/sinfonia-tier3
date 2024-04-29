@@ -97,17 +97,17 @@ class WireguardKeyFormatter:
 def sinfonia_deploy(
         tier1_url: URL, 
         geoloc: GeoLocation,
-        application_uuid: UUID,
+        app_uuid: UUID,
         debug: bool = False, 
 ) -> list[CloudletDeployment]:
     """Request a backend (re)deployment from the orchestrator"""    
     deploy_base = tier1_url
 
-    deployment_keys = KeyCacheEntry.load(application_uuid)
+    deployment_keys = KeyCacheEntry.load(app_uuid)
     deployment_url = (
         deploy_base
         / "api/v1/deploy"
-        / str(application_uuid)
+        / str(app_uuid)
         / deployment_keys.public_key.urlsafe
     )
     deployment_header = {

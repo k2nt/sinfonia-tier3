@@ -81,7 +81,7 @@ def get_geoloc_value(csv_file, row_name):
 
 
 def print_deployment_status(
-        application_uuid: UUID,
+        app_uuid: UUID,
         deployments: list[CloudletDeployment], 
         connected_deployment: CloudletDeployment,
         deployment_status: DeploymentStatus,
@@ -119,7 +119,7 @@ def print_deployment_status(
     print(f"  * Client zone: {CLIENT_ZONE}")
     print(f"  * Host zone: {server_zone}")
     print(f"  * Simulated latency (milliseconds): {INJECTED_LATENCY}")
-    print(f"  * Deployed app: {application_uuid} ({uuid_to_app_name(application_uuid)})")
+    print(f"  * Deployed app: {app_uuid} ({uuid_to_app_name(app_uuid)})")
     print(f"  * Deployment size: {len(deployments)}")
     print(f"  * Deployment hosts: {deployment_hosts}")
     print(f"  * Connected host IP: {highlight_repr(connected_deployment_host)}")
@@ -136,8 +136,9 @@ def print_separator():
 def sinfonia_tier3_loadtest(
         tier1_url: str = typer.Option("http://192.168.245.31:5000"),
         dry_run: bool = typer.Option(False),
-        application_uuid: str = typer.Option("loadtest"),
-        application: str = typer.Option("/bin/bash"),
+        app_uuid: str = typer.Option("loadtest"),
+        app_port: int = typer.Option(30080),
+        local_app: str = typer.Option("/bin/bash"),
         loadtest_config_path: str = typer.Option("src/sinfonia_tier3_loadtest/.cli.toml"),
         T: int = typer.Option(5, help="Number of samples"),
         config_debug: bool = typer.Option(False),
@@ -154,10 +155,10 @@ def sinfonia_tier3_loadtest(
     CLIENT_GEOLOCATION = GeoLocation(lat=lat, long=long)
     
     try:
-        application_uuid = UUID(application_uuid)
+        app_uuid = UUID(app_uuid)
     except Exception:
         try:
-            application_uuid = app_name_to_uuid(application_uuid)
+            app_uuid = app_name_to_uuid(app_uuid)
         except Exception as e:
             print(f"app not supported")
             exit(1)
@@ -181,7 +182,7 @@ def sinfonia_tier3_loadtest(
             deployments = sinfonia_deploy(
                 tier1_url=URL(tier1_url), 
                 geoloc=CLIENT_GEOLOCATION, 
-                application_uuid=application_uuid, 
+                app_uuid=app_uuid, 
                 debug=debug
                 )
             print("Done!")
@@ -204,7 +205,7 @@ def sinfonia_tier3_loadtest(
         # print(deployments[0])
         
         print_deployment_status(
-            application_uuid=application_uuid,
+            app_uuid=app_uuid,
             deployments=deployments,
             deployment_status=deployment_status,
             error_log=error_log,
@@ -234,10 +235,11 @@ def sinfonia_tier3_loadtest(
                     deployment_data.tunnel_config,
                     deployment_host,
                     loadtest_config_path,
-                    application,
+                    local_app,
                     INJECTED_LATENCY,
                     CLIENT_ZONE,
                     web_port,
+                    app_port,
                     config_debug,
                     )
         except Exception as e:

@@ -21,11 +21,12 @@ def loadtest(
         headless: bool = typer.Option(False),
         tier2_url: str = typer.Option(""),
         latency_ms: float = typer.Option(0),
-        web_port: int = typer.Option(0)
+        web_port: int = typer.Option(0),
+        app_port: int = typer.Option(80)
 ):      
     config = Config(node_name, config_path)
     if tier2_url:
-        config.c["network"]["app_root_url"] = str(URL(tier2_url).with_port(30080) / "api" / "v1")
+        config.c["network"]["app_root_url"] = str(URL(tier2_url).with_port(app_port) / "api" / "v1")
         config.c["network"]["tier2_root_url"] = str(URL(tier2_url).with_port(30051) / "api" / "v1")
     
     if not headless:
