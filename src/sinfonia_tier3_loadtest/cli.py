@@ -111,7 +111,7 @@ def print_deployment_status(
         if connected_deployment_host in config.keys():
             server_zone = config[connected_deployment_host]
             global INJECTED_LATENCY
-            INJECTED_LATENCY = get_value(LATENCY_FILE, CLIENT_ZONE, server_zone)
+            INJECTED_LATENCY = get_value(LATENCY_FILE, CLIENT_ZONE, server_zone) / 2
         else:
             print(f'{connected_deployment_host} is not in the config. Pleae check the config file {CONFIG_FILE}!')
     
