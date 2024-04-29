@@ -10,3 +10,4 @@ __pycache__/
 report
 
 kgctl
+**/.locust.autogen.toml
