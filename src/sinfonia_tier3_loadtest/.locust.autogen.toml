@@ -3,11 +3,11 @@
 [report]
 is_report_locust_stats = false
 report_per_second = 15
-report_root_path = "src/sinfonia_tier3_loadtest/report/1714343706-Tallahasse"
+report_root_path = "src/sinfonia_tier3_loadtest/report/Jacksonville-1714411548"
 
 [network]
-app_root_url = "http://192.168.245.37:30080/api/v1"
-tier2_root_url = "http://192.168.245.37:30051/api/v1"
+app_root_url = "http://192.168.245.31:30080/api/v1"
+tier2_root_url = "http://192.168.245.31:30051/api/v1"
 
 [load]
 num_concurrent_clients = 1
@@ -21,4 +21,4 @@ spawn_rate = 2
 rps_per_user = 10
 
 [metadata]
-bts_unix = 1714343706
+bts_unix = 1714411548

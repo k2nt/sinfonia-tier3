@@ -242,7 +242,6 @@ def sinfonia_tier3_loadtest(
                     )
         except Exception as e:
             print(f"exception: {e}")
-            raise e
             break
     
     print()    

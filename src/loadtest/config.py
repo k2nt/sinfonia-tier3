@@ -31,7 +31,7 @@ class Config:
         if not self.c['cli']['is_report']:
             del self.c['report']
         else:
-            self.c['report']['report_root_path'] = str(Path(self.c['report']['report_root_path']) / f"{str(self.c['metadata']['bts_unix'])}-{node_name}")
+            self.c['report']['report_root_path'] = str(Path(self.c['report']['report_root_path']) / f"{node_name}-{str(self.c['metadata']['bts_unix'])}")
     
 
     def to_locust_args(
