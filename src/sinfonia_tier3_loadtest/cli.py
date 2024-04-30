@@ -217,13 +217,12 @@ def sinfonia_tier3_loadtest(
         
         # This is to wait for loadtest app to completely terminate
         # Not ideal (and can bug), but this seems to work for now
-        if t > 0:
-            print()
-            print("10-second countdown before next test")
-            for i in range(10, 0, -1):
-                print(f"{i} ... ", end='', flush=True)
-                time.sleep(1)
-            print("Done!")
+        print()
+        print("10-second countdown before test starts")
+        for i in range(10, 0, -1):
+            print(f"{i} ... ", end='', flush=True)
+            time.sleep(1)
+        print("Done!")
             
         if dry_run:
             continue
