@@ -66,6 +66,7 @@ def run_loadtest_proc(
         latency_ms, 
         client_zone, 
         web_port,
+        master_port,
         app_port,
 ):
     poetry_command = which("poetry")
@@ -89,6 +90,8 @@ def run_loadtest_proc(
         client_zone,
         "--web-port",
         str(web_port),
+        "--master-port",
+        str(master_port),
         "--app-port",
         str(app_port),
         ]
@@ -109,6 +112,7 @@ def sinfonia_runapp(
     latency_ms: float,
     client_zone: str,
     web_port: int,
+    master_port: int,
     app_port: int,
     config_debug: bool = False,
 ) -> int:
@@ -179,6 +183,7 @@ def sinfonia_runapp(
                     latency_ms, 
                     client_zone, 
                     web_port,
+                    master_port,
                     app_port,
                     )
             except Exception as e:

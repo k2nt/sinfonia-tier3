@@ -21,8 +21,9 @@ def loadtest(
         headless: bool = typer.Option(False),
         tier2_url: str = typer.Option(""),
         latency_ms: float = typer.Option(0),
-        web_port: int = typer.Option(0),
-        app_port: int = typer.Option(80)
+        web_port: int = typer.Option(8089),
+        master_port: int = typer.Option(5557),
+        app_port: int = typer.Option(30080)
 ):      
     config = Config(node_name, config_path)
     if tier2_url:
@@ -62,8 +63,11 @@ def loadtest(
         locust_command = shutil.which("locust")
         assert locust_command is not None
 
-        if web_port != 0:
-            loadtest_command = [locust_command] + config.to_locust_args(rps_per_user=rps_per_user, web_port=web_port)
+        loadtest_command = [locust_command] + config.to_locust_args(
+            rps_per_user=rps_per_user, 
+            web_port=web_port,
+            master_port=master_port,
+            )
     
         # Clean up previous latency
         remove_latency()

@@ -145,6 +145,7 @@ def sinfonia_tier3_loadtest(
         debug: bool = typer.Option(False),
         zone: str = typer.Option(""),
         web_port: int = typer.Option(8089),
+        master_port: int = typer.Option(5557),
 ) -> int:
     if zone:
         global CLIENT_ZONE
@@ -238,6 +239,7 @@ def sinfonia_tier3_loadtest(
                     INJECTED_LATENCY,
                     CLIENT_ZONE,
                     web_port,
+                    master_port,
                     app_port,
                     config_debug,
                     )
