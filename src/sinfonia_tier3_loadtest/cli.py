@@ -36,9 +36,9 @@ from .app_name import uuid_to_app_name, app_name_to_uuid
 # Jacksonville, FL
 CLIENT_GEOLOCATION = GeoLocation(lat=30.209041, long=-81.592600)
 # Region
-CONFIG_FILE = 'src/sinfonia_tier3_loadtest/FL.json'
-LATENCY_FILE = 'src/sinfonia_tier3_loadtest/FL.csv'
-GEOLOC_FILE = 'src/sinfonia_tier3_loadtest/FL-geoloc.csv'
+CONFIG_FILE = 'src/sinfonia_tier3_loadtest/EU.json'
+LATENCY_FILE = 'src/sinfonia_tier3_loadtest/EU.csv'
+GEOLOC_FILE = 'src/sinfonia_tier3_loadtest/EU-geoloc.csv'
 # Zone
 CLIENT_ZONE = 'Jacksonville'
 INJECTED_LATENCY = 0
