@@ -97,7 +97,9 @@ def on_worker_report(client_id, data):
     avg_latency = np.mean(response_times_list)
     p95 = np.percentile(response_times_list, 95)
     
-    # num_rps = stats_total['num_reqs_per_sec']s
+    num_reqs_each_sec = stats_total['num_reqs_per_sec']
+    rps = sum(num_reqs_each_sec.values()) / len(num_reqs_each_sec)
+
     # start_ts = stats_total['start_time']
     last_request_ts = stats_total['last_request_timestamp']
     
@@ -106,7 +108,8 @@ def on_worker_report(client_id, data):
             # round(start_ts),
             round(last_request_ts),
             round(avg_latency),
-            round(p95)
+            round(p95),
+            round(rps)
         ])
     
 def write_latency_data(latency_csv_file):
